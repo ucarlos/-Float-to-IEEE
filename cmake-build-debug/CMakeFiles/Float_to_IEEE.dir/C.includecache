@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c
+common_header.h
+/home/ulysses/CLionProjects/2019/Float to IEEE/common_header.h
+math.h
+-
+stdbool.h
+-
+
+/home/ulysses/CLionProjects/2019/Float to IEEE/common_header.h
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+ctype.h
+-
+stdarg.h
+-
+stdint.h
+-
+limits.h
+-
+linux/random.h
+-
+unistd.h
+-
+pthread.h
+-
+
