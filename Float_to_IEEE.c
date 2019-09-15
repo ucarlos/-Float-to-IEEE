@@ -157,8 +157,6 @@ void Reverse_Bit_Representation(char *string, int string_length){
         string[i + 1] = string[end_point + 1];
         string[end_point] = temp1;
         string[end_point + 1] = temp2;
-
-
     }
 }
 
@@ -314,7 +312,7 @@ void Separate_Floating_Number(struct float_number *fn){
     }
 
     //Generate Normalization Value:
-    long long int test_exponent_val = (fn->isDouble) ? DOUBLE_MAX_EXPONENT_VAL : FLOAT_MAX_EXPONENT_VAL;
+    uint64_t test_exponent_val = (fn->isDouble) ? DOUBLE_MAX_EXPONENT_VAL : FLOAT_MAX_EXPONENT_VAL;
     fn->float_status = (fn->exponent_val == test_exponent_val) ? Special_Case :
             (!fn->exponent_val)? Denormalized : Normalized;
 
