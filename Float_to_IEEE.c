@@ -1,11 +1,15 @@
 
 /* ----------------------------------------------------------------------------------------------------
  *
- *  Created by Ulysses Carlos on 3/13/19 (Earlier versions were created the weekend before)
+ *  Created by Ulysses Carlos on 3/13/19 (Earlier versions were created the weekend before at a
+ *  friend's house.)
  *
  *  Program Amendments:
  *      Various adjustments made before 07/21/19
  *      07/21/19 -- Introduced commenting to make program easier to read
+ *      09/14/19 -- Replaced the Bit-field Normalization_Status with enum
+ *                  Changed Print_Floating_Number to display Special Case Floating-Point Numbers.
+ *                  Changed unsigned long long ints to uint64 for portability
  *
  *  Program Usage:
  *      This program converts a floating-point number (whether single or double precision), and converts
@@ -28,14 +32,15 @@
  *      As an example, try to take a number (say 12.25), and convert it by hand first by converting
  *      it to binary(using Fractional Binary numbers), and then convert the Fractional number into
  *      its Floating-Point version by finding its bias, etc.
+ *      
+ *      The idea behind using a byte pointer came from Randall Bryant's Computer Systems (3rd Edition)
+ *      so, I give credit to him.
  *
  * ----------------------------------------------------------------------------------------------------
  */
 
 #include "common_header.h"
-
 #include <math.h>
-#include <stdbool.h>
 
 // Size Definitions
 #define FLOAT_SIZE (sizeof(float) * 8)
@@ -60,16 +65,44 @@
 #define DOUBLE_EXP_MASK (0x7ff0000000000000)
 #define DOUBLE_FRAC_MASK (0x000fffffffffffff)
 
+
+// For Terminal Screen:
 #define CHAR_LINE ('-')
+#define WINDOW_SIZE (90)
+
 // Typedefs:
 typedef unsigned char *byte_pointer;
 
+
+/*
+ * Enum Status:
+ * Normalized   Floating Value (Exponent not 0 or 255(2047 for Double))
+ * Denormalized Floating Value (Exponent is 0)
+ * Special Case Floating Value (Exponent is 255 or 2047))
+ *
+*/
+enum Floating_Number_Status{
+    Normalized = 0, Denormalized, Special_Case
+};
+
+/*
+ * Normalization Status:
+ * Initialized: Initial value
+ * Not_Separated: Byte Representation has been created, but Number has not
+ *                been separated.
+ * Separated: Number is ready to be classified.
+*/
+
+enum Normalization_Status{
+    Initialized = 0, Not_Separated, Separated
+};
+
 // Struct definition
-typedef struct float_number{
-	unsigned long long int sign_val;
-	unsigned long long int exponent_val;
-	unsigned long long int fractional;
-	unsigned long long int byte_rep;
+ struct float_number{
+    uint64_t sign_val;
+	uint64_t exponent_val;
+	uint64_t fractional;
+	uint64_t byte_rep;
 	int weighed_bias;
 	bool isDouble;
 
@@ -80,31 +113,20 @@ typedef struct float_number{
 	}value;
     long double signficand_val;
 
-    /* Normalization Status
-     * Status 0: Normalized Floating value (Exponent not 0 or 255(2047) )
-     * Status 1: Denormalized Floating value (Exponent 0)
-     * Status 2: Special_Case (Exponent 255(2047) )
-     * Status 3: Byte Representation has been created, but Floating Point Number
-     *           has not been seperated
-     * Status 4: Initial Value
-     * Status 5-7: NOT USED
-     */
-    struct{
-        unsigned int value : 3;
-    }Normalization_Status;
-
-}Float_Number;
+    enum Floating_Number_Status float_status;
+    enum Normalization_Status norm_status;
+};
 
 // Structure Functions Prototypes::
 void Initialize_Floating_Number(struct float_number *fn);
 void Create_Bit_Representation(struct float_number *fn);
 void Separate_Floating_Number(struct float_number *fn);
 void Print_Float_Number(struct float_number *fn);
-void Generate_Sigificand_Number(struct float_number *fn);
+void Generate_Significand_Number(struct float_number *fn);
 void Print_Error_Message(unsigned int error_code);
 void Print_Instructions(void);
 void Center_Line(int start, int end);
-
+void Center_Float_Number(struct float_number *fn);
 
 // Helper Functions
 int Test_Little_Endian(void);
@@ -136,6 +158,7 @@ void Reverse_Bit_Representation(char *string, int string_length){
         string[end_point] = temp1;
         string[end_point + 1] = temp2;
 
+
     }
 }
 
@@ -151,7 +174,7 @@ void Print_Instructions(void){
 
 }
 
-#define WINDOW_SIZE (90)
+
 void print_dash_line(void){
     for (int i = 0; i < WINDOW_SIZE; i++)
         putchar(CHAR_LINE);
@@ -164,6 +187,7 @@ void print_partial_line(int start, int size){
         Print_Error_Message(5);
         exit(EXIT_FAILURE);
     }
+
     int loop_end = (start + size);
     for (int i = start; i < loop_end; i++)
         putchar(CHAR_LINE);
@@ -174,6 +198,9 @@ void print_partial_line(int start, int size){
 void Print_Error_Message(unsigned int error_code){
     printf("Error: ");
     switch(error_code){
+        case 1:
+            printf("Invalid Input.");
+            break;
         case 2:
             printf("Cannot use a Special-Case "
                    "Floating-Point Number for this situation.\n");
@@ -212,7 +239,7 @@ void Initialize_Floating_Number(struct float_number *fn){
 
 	if (!(test == 1 || test == 2)){
 	    system("clear");
-		printf("Invalid Input. This program will now close.");
+		puts("Invalid Input. This program will now close.");
 		sleep(1);
 		exit(EXIT_FAILURE);
 	}
@@ -229,7 +256,7 @@ void Initialize_Floating_Number(struct float_number *fn){
         fn->isDouble = true;
     };
 
-	fn->Normalization_Status.value = 4;
+	fn->norm_status = Initialized;
     system("clear");
 }
 
@@ -254,16 +281,16 @@ void Create_Bit_Representation(struct float_number *fn){
         Reverse_Bit_Representation(string, (int)strlen(string));
 
     // Now read into fn:
-    fn->byte_rep = (unsigned long long int) strtoll(string, &endpoint, 16);
+    fn->byte_rep = (uint64_t) strtoll(string, &endpoint, 16);
     // Change Status:
-    fn->Normalization_Status.value = 3;
+    fn->norm_status = Not_Separated;
     free(string);
 }
 
 
 void Separate_Floating_Number(struct float_number *fn){
     // Can only be used after Create_Bit_Representation()
-    if (fn->Normalization_Status.value > 3){
+    if (fn->norm_status < Not_Separated){
         Print_Error_Message(4);
         return;
     }
@@ -287,37 +314,25 @@ void Separate_Floating_Number(struct float_number *fn){
     }
 
     //Generate Normalization Value:
-    if (fn->isDouble)
-        fn->Normalization_Status.value = (fn->exponent_val == DOUBLE_MAX_EXPONENT_VAL) ? 2 :
-                                         (fn->exponent_val == 0) ? 1 : 0;
-    else
-        fn->Normalization_Status.value = (fn->exponent_val == FLOAT_MAX_EXPONENT_VAL) ? 2:
-                                         (fn->exponent_val == 0) ? 1 : 0;
+    long long int test_exponent_val = (fn->isDouble) ? DOUBLE_MAX_EXPONENT_VAL : FLOAT_MAX_EXPONENT_VAL;
+    fn->float_status = (fn->exponent_val == test_exponent_val) ? Special_Case :
+            (!fn->exponent_val)? Denormalized : Normalized;
+
 
     //Generate Bias for Normalized and Denormalized values:
-    if (fn->Normalization_Status.value != 2){
+    if (fn->float_status != Special_Case){
         int temp_bias = (fn -> isDouble) ? DOUBLE_EXPONENT_BIAS : FLOAT_EXPONENT_BIAS;
-        fn->weighed_bias = (!fn->Normalization_Status.value) ? ((int) fn->exponent_val - temp_bias)
+        fn->weighed_bias = (!fn->float_status) ? ((int) fn->exponent_val - temp_bias)
                 : (1 - temp_bias);
 
-/* Same as above:
-
-        if (fn->isDouble)
-           fn->weighed_bias = (!fn->Normalization_Status.value) ?
-                   ((int) fn->exponent_val - DOUBLE_EXPONENT_BIAS)
-                   : (1 - DOUBLE_EXPONENT_BIAS);
-        else
-            fn->weighed_bias = (!fn->Normalization_Status.value) ?
-                    ((int)fn->exponent_val - FLOAT_EXPONENT_BIAS)
-                    : (1 - FLOAT_EXPONENT_BIAS);
-*/
 
     }
+    fn->norm_status = Separated;
 
 }
 
-void Generate_Sigificand_Number(struct float_number *fn){
-    if (fn->Normalization_Status.value >= 3){
+void Generate_Significand_Number(struct float_number *fn){
+    if (fn->norm_status != Separated){
         Print_Error_Message(3);
         return;
     }
@@ -332,7 +347,7 @@ void Center_Line(int start, int end){
 }
 
 void Print_Float_Number(struct float_number *fn){
-    if (fn->Normalization_Status.value >= 3){ // Considers case 3, 4, and 5, 6, 7(Not used)
+    if (fn->norm_status != Separated){
         Print_Error_Message(3);
         return;
     }
@@ -344,21 +359,23 @@ void Print_Float_Number(struct float_number *fn){
         printf("Initial Number: %.4f (Single Precision)\n", fn->value.float_value);
 
 
-    printf("Bit Representation (In Hexadecimal): 0x%llx\n", fn->byte_rep);
-    printf("Sign Value: %llu", fn->sign_val);
-    printf(!fn->sign_val? " (Positive)\n" : " (Negative)\n");
-    printf("Exponent Value: %llu\n", fn->exponent_val);
-    printf("Fractional Value (In Hexadecimal): 0x%llx\n", fn->fractional);
+    printf("Bit Representation (In Hexadecimal): 0x%" PRIx64 "\n", fn->byte_rep);
+    printf("Sign Value: %" PRIu64, fn->sign_val);
+    printf(!(fn->sign_val)? " (Positive)\n" : " (Negative)\n");
+    printf("Exponent Value: %" PRIu64 "\n", fn->exponent_val);
+    printf("Fractional Value (In Hexadecimal): 0x%" PRIx64 "\n", fn->fractional);
 
     printf("Floating-Point Classification: ");
-    if (fn->Normalization_Status.value == 2)
+    
+    if (fn->float_status == Special_Case)
         printf("Special Case (Exponent field is all ones)\n");
-    else if (fn->Normalization_Status.value == 1)
+    else if (fn->float_status == Denormalized)
         printf("Denormalized(Exponent field is all zeros)\n");
     else
         printf("Normalized\n");
-
-    if (fn->Normalization_Status.value != 2){
+    
+    // For Normalized and Denormalized Values:
+    if (fn->float_status != Special_Case){
         printf("Weighed Bias value : %d\n", fn->weighed_bias);
         printf("So in M * 2^E form, the number ");
 
@@ -369,6 +386,23 @@ void Print_Float_Number(struct float_number *fn){
         printf("\n\n");
 
         // Center number:
+	    Center_Float_Number(fn);
+    	printf("When multiplied, the result is %.24Lf\n", fn->signficand_val * pow(2, fn->weighed_bias));
+    }
+    else{ 
+	    printf("Special Case Value: ");
+	    if (!(fn->fractional))
+	        printf(!(fn->sign_val)? "Positive Infinity\n" : "Negative Infinity\n");
+	    else
+	        printf("Not A Number (NaN)\n");
+    }
+
+    print_dash_line();
+
+}
+
+void Center_Float_Number(struct float_number *fn){
+
         char *mantissa_string = calloc(WINDOW_SIZE / 2, sizeof(char));
         char *exponent_string = calloc(WINDOW_SIZE / 2, sizeof(char));
         sprintf(mantissa_string, "%.24Lf", fn->signficand_val);
@@ -383,10 +417,6 @@ void Print_Float_Number(struct float_number *fn){
         printf(" * 2^%s\n", exponent_string);
         print_partial_line(WINDOW_SIZE - center_val, center_val);
         puts("");
-    }
-    
-    printf("When multiplied, the result is %.24Lf\n", fn->signficand_val * pow(2, fn->weighed_bias));
-    print_dash_line();
 
 }
 
@@ -401,17 +431,14 @@ void compute(void){
     Initialize_Floating_Number(fn);
     Create_Bit_Representation(fn);
     Separate_Floating_Number(fn);
-    Generate_Sigificand_Number(fn);
+    Generate_Significand_Number(fn);
     Print_Float_Number(fn);
     Additional_Info();
     free(fn);
 
-
-}	
-
+}
 
 int main(void){
     compute();
     return 0;
 }
-

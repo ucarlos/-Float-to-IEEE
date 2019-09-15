@@ -6,7 +6,12 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include <stdint.h>
+
+// Use inttypes.h instead of stdint.h
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+//#include <stdint.h>
+#include <stdbool.h>
 //Math Libraries
 
 //#include <math.h>

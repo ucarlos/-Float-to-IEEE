@@ -11,8 +11,6 @@ common_header.h
 /home/ulysses/CLionProjects/2019/Float to IEEE/common_header.h
 math.h
 -
-stdbool.h
--
 
 /home/ulysses/CLionProjects/2019/Float to IEEE/common_header.h
 stdio.h
@@ -25,7 +23,9 @@ ctype.h
 -
 stdarg.h
 -
-stdint.h
+inttypes.h
+-
+stdbool.h
 -
 limits.h
 -
