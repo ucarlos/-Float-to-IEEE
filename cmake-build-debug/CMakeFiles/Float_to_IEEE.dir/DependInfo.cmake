@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
   "/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c" "/home/ulysses/CLionProjects/2019/Float to IEEE/cmake-build-debug/CMakeFiles/Float_to_IEEE.dir/Float_to_IEEE.c.o"
+  "/home/ulysses/CLionProjects/2019/Float to IEEE/Test_Float.c" "/home/ulysses/CLionProjects/2019/Float to IEEE/cmake-build-debug/CMakeFiles/Float_to_IEEE.dir/Test_Float.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

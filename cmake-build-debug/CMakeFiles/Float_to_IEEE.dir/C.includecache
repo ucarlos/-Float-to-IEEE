@@ -6,13 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c
-common_header.h
-/home/ulysses/CLionProjects/2019/Float to IEEE/common_header.h
-math.h
--
-
-/home/ulysses/CLionProjects/2019/Float to IEEE/common_header.h
+/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEE.h
 stdio.h
 -
 stdlib.h
@@ -23,16 +17,18 @@ ctype.h
 -
 stdarg.h
 -
+limits.h
+-
 inttypes.h
 -
 stdbool.h
 -
-limits.h
--
-linux/random.h
+math.h
 -
 unistd.h
 -
-pthread.h
--
+
+/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c
+Float_to_IEE.h
+/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEE.h
 

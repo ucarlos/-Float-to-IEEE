@@ -108,7 +108,9 @@ int Test_Little_Endian(void);
 void Reverse_Bit_Representation(char *string, int string_length);
 void String_to_Lower(char *string);
 
-
+// Line Drawing Functions:
+void print_dash_line(void);
+void print_partial_line(int start, int size);
 
 
 #endif

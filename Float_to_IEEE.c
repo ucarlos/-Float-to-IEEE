@@ -91,12 +91,15 @@ void String_to_Lower(char *string){
 }
 
 void Print_Instructions(void){
-	printf("This Program evaluates a Float (32-bit Floating-point) "
-        "or a Double (64-bit Floating-point) value.\n");
-	printf("If you plan on using a Float number, Please input 1. "
-        "If you plan on using a Double number, "
-        "Please input 2.\n");
-	printf("If you don't know which to choose, input 2.\n");
+    print_dash_line();
+
+	printf("This program evaluates a value with Single Precision (a \"float\")"
+        "\nor with Double Precision(a \"double\")\n\n");
+
+	printf("Input 1 for Single Precision and 2 for Double Precision.\n");
+	printf("If Uncertain, input 2.\n");
+
+	print_dash_line();
 
 }
 
@@ -311,6 +314,7 @@ void Print_Float_Number(struct float_number *fn){
     }
 
     print_dash_line();
+    puts("Floating Point Information:");
     Print_General_Float_Info(fn);
     // For Normalized and Denormalized Values:
     if (fn->float_status != Special_Case){
