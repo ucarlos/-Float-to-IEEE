@@ -10,6 +10,8 @@
  *      09/14/19 -- Replaced the Bit-field Normalization_Status with enum
  *                  Changed Print_Floating_Number to display Special Case Floating-Point Numbers.
  *                  Changed unsigned long long ints to uint64 for portability
+ *     10/19/19  -- Added Edit_Floating_Number to change value, moved macros, structure and function definitions
+ *                  to Float_to_IEE.h
  *
  *  Program Usage:
  *      This program converts a floating-point number (whether single or double precision), and converts
@@ -36,101 +38,19 @@
  *      The idea behind using a byte pointer came from Randall Bryant's Computer Systems (3rd Edition)
  *      so, I give credit to him.
  *
+ *  Additional Information:
+ *      Bitmasks used:
+ *          #define FLOAT_SIGN_MASK (0x80000000)
+ *          #define FLOAT_EXP_MASK (0x7f800000)
+ *          #define FLOAT_FRAC_MASK (0x007fffff)
+ *          #define DOUBLE_SIGN_MASK (0x8000000000000000)
+ *          #define DOUBLE_EXP_MASK (0x7ff0000000000000)
+ *          #define DOUBLE_FRAC_MASK (0x000fffffffffffff)
+ *
  * ----------------------------------------------------------------------------------------------------
  */
 
-#include "common_header.h"
-#include <math.h>
-
-// Size Definitions
-#define FLOAT_SIZE (sizeof(float) * 8)
-#define FLOAT_LEN (sizeof(float))
-#define FLOAT_EXPONENT_BIAS (((1 << 7) - 1))
-#define FLOAT_EXP_LEN (8)
-#define FLOAT_FRAC_LEN (23)
-#define FLOAT_MAX_EXPONENT_VAL ((1 << 8) - 1)
-
-#define DOUBLE_SIZE (2 * FLOAT_SIZE)
-#define DOUBLE_LEN (sizeof(double))
-#define DOUBLE_EXPONENT_BIAS (((1 << 10) - 1))
-#define DOUBLE_EXP_LEN (11)
-#define DOUBLE_FRAC_LEN (52)
-#define DOUBLE_MAX_EXPONENT_VAL ((1 << 11) - 1)
-
-// Bit Masks:
-#define FLOAT_SIGN_MASK (0x80000000)
-#define FLOAT_EXP_MASK (0x7f800000)
-#define FLOAT_FRAC_MASK (0x007fffff)
-#define DOUBLE_SIGN_MASK (0x8000000000000000)
-#define DOUBLE_EXP_MASK (0x7ff0000000000000)
-#define DOUBLE_FRAC_MASK (0x000fffffffffffff)
-
-
-// For Terminal Screen:
-#define CHAR_LINE ('-')
-#define WINDOW_SIZE (90)
-
-// Typedefs:
-typedef unsigned char *byte_pointer;
-
-
-/*
- * Enum Status:
- * Normalized   Floating Value (Exponent not 0 or 255(2047 for Double))
- * Denormalized Floating Value (Exponent is 0)
- * Special Case Floating Value (Exponent is 255 or 2047))
- *
-*/
-enum Floating_Number_Status{
-    Normalized = 0, Denormalized, Special_Case
-};
-
-/*
- * Normalization Status:
- * Initialized: Initial value
- * Not_Separated: Byte Representation has been created, but Number has not
- *                been separated.
- * Separated: Number is ready to be classified.
-*/
-
-enum Normalization_Status{
-    Initialized = 0, Not_Separated, Separated
-};
-
-// Struct definition
- struct float_number{
-    uint64_t sign_val;
-	uint64_t exponent_val;
-	uint64_t fractional;
-	uint64_t byte_rep;
-	int weighed_bias;
-	bool isDouble;
-
-    //Union to separate float and double:
-	union datatype_value{
-		double double_value;
-		float float_value;
-	}value;
-    long double signficand_val;
-
-    enum Floating_Number_Status float_status;
-    enum Normalization_Status norm_status;
-};
-
-// Structure Functions Prototypes::
-void Initialize_Floating_Number(struct float_number *fn);
-void Create_Bit_Representation(struct float_number *fn);
-void Separate_Floating_Number(struct float_number *fn);
-void Print_Float_Number(struct float_number *fn);
-void Generate_Significand_Number(struct float_number *fn);
-void Print_Error_Message(unsigned int error_code);
-void Print_Instructions(void);
-void Center_Line(int start, int end);
-void Center_Float_Number(struct float_number *fn);
-
-// Helper Functions
-int Test_Little_Endian(void);
-void Reverse_Bit_Representation(char *string, int string_length);
+#include "Float_to_IEE.h"
 
 
 int Test_Little_Endian(void){
@@ -161,6 +81,14 @@ void Reverse_Bit_Representation(char *string, int string_length){
 }
 
 
+void String_to_Lower(char *string){
+    char temp;
+    for (char *p = string; (*p); p++) {
+        temp = tolower(*p);
+        *p = temp;
+    }
+
+}
 
 void Print_Instructions(void){
 	printf("This Program evaluates a Float (32-bit Floating-point) "
@@ -182,8 +110,7 @@ void print_dash_line(void){
 void print_partial_line(int start, int size){
     Center_Line(0, start);
     if ((start + size) > WINDOW_SIZE) {
-        Print_Error_Message(5);
-        exit(EXIT_FAILURE);
+        Error(5);
     }
 
     int loop_end = (start + size);
@@ -191,6 +118,12 @@ void print_partial_line(int start, int size){
         putchar(CHAR_LINE);
     printf("\n");
 
+}
+
+
+void Error(unsigned int error_code){
+    Print_Error_Message(error_code);
+    exit(EXIT_FAILURE);
 }
 
 void Print_Error_Message(unsigned int error_code){
@@ -215,10 +148,15 @@ void Print_Error_Message(unsigned int error_code){
         case 5:
             printf("Partial line is larger than window length (%d)\n", WINDOW_SIZE);
             break;
+        case 6:
+            printf("Edit_Floating_Number must have a string of \"double\" or \"float\" "
+                   "as a parameter.\n");
+            break;
         default:
             puts("An Unknown error has occurred. Exiting.");
             break;
     }
+
 }
 
 //--------------------------------------------------------------------------------
@@ -259,7 +197,8 @@ void Initialize_Floating_Number(struct float_number *fn){
 }
 
 void Create_Bit_Representation(struct float_number *fn){
-
+    // There should be a test here to prevent an uninitialized struct here
+    // But I can't think up of one right now.
     int string_size = (fn->isDouble) ? DOUBLE_SIZE : FLOAT_SIZE;
     char *string = calloc(string_size, sizeof(char));
     byte_pointer float_address = (byte_pointer) &fn->value;
@@ -289,8 +228,7 @@ void Create_Bit_Representation(struct float_number *fn){
 void Separate_Floating_Number(struct float_number *fn){
     // Can only be used after Create_Bit_Representation()
     if (fn->norm_status < Not_Separated){
-        Print_Error_Message(4);
-        return;
+        Error(4);
     }
     // Difference Masks are used depending on float/double
     // and are right-shifted depending on the length of the data type
@@ -331,8 +269,7 @@ void Separate_Floating_Number(struct float_number *fn){
 
 void Generate_Significand_Number(struct float_number *fn){
     if (fn->norm_status != Separated){
-        Print_Error_Message(3);
-        return;
+        Error(3);
     }
 
     fn->signficand_val = (fn->isDouble) ? significandl(fn->value.double_value) :
@@ -344,13 +281,7 @@ void Center_Line(int start, int end){
         printf(" "); // Adds white space until the center is reached
 }
 
-void Print_Float_Number(struct float_number *fn){
-    if (fn->norm_status != Separated){
-        Print_Error_Message(3);
-        return;
-    }
-
-    print_dash_line();
+void Print_General_Float_Info(struct float_number *fn){
     if (fn->isDouble)
         printf("Initial Number: %.4f (Double Precision)\n", fn->value.double_value);
     else
@@ -364,14 +295,23 @@ void Print_Float_Number(struct float_number *fn){
     printf("Fractional Value (In Hexadecimal): 0x%" PRIx64 "\n", fn->fractional);
 
     printf("Floating-Point Classification: ");
-    
+
     if (fn->float_status == Special_Case)
         printf("Special Case (Exponent field is all ones)\n");
     else if (fn->float_status == Denormalized)
         printf("Denormalized(Exponent field is all zeros)\n");
     else
         printf("Normalized\n");
-    
+
+}
+
+void Print_Float_Number(struct float_number *fn){
+    if (fn->norm_status != Separated){
+        Error(3);
+    }
+
+    print_dash_line();
+    Print_General_Float_Info(fn);
     // For Normalized and Denormalized Values:
     if (fn->float_status != Special_Case){
         printf("Weighed Bias value : %d\n", fn->weighed_bias);
@@ -382,7 +322,6 @@ void Print_Float_Number(struct float_number *fn){
         else
             printf(" %.4f is represented as ", fn->value.float_value);
         printf("\n\n");
-
         // Center number:
 	    Center_Float_Number(fn);
     	printf("When multiplied, the result is %.24Lf\n", fn->signficand_val * pow(2, fn->weighed_bias));
@@ -400,21 +339,47 @@ void Print_Float_Number(struct float_number *fn){
 }
 
 void Center_Float_Number(struct float_number *fn){
+    char *mantissa_string = calloc(WINDOW_SIZE / 2, sizeof(char));
+    char *exponent_string = calloc(WINDOW_SIZE / 2, sizeof(char));
+    sprintf(mantissa_string, "%.24Lf", fn->signficand_val);
+    sprintf(exponent_string, "%d", fn->weighed_bias);
+    int exponent_space = 5; // Accounts for 5-digit exponent values(i.e 2^0 - 2^99999), adjust if necessary
+    int center_val = (strlen(mantissa_string) + exponent_space + strlen(exponent_string));
 
-        char *mantissa_string = calloc(WINDOW_SIZE / 2, sizeof(char));
-        char *exponent_string = calloc(WINDOW_SIZE / 2, sizeof(char));
-        sprintf(mantissa_string, "%.24Lf", fn->signficand_val);
-        sprintf(exponent_string, "%d", fn->weighed_bias);
-        int exponent_space = 5; // Accounts for 5-digit exponent values(i.e 2^0 - 2^99999), adjust if necessary
-        int center_val = (strlen(mantissa_string) + exponent_space + strlen(exponent_string));
+    print_partial_line(WINDOW_SIZE - (center_val), center_val);
+    Center_Line(0, WINDOW_SIZE - (center_val));
 
-        print_partial_line(WINDOW_SIZE - (center_val), center_val);
-        Center_Line(0, WINDOW_SIZE - (center_val));
+    printf("%s", mantissa_string);
+    printf(" * 2^%s\n", exponent_string);
+    print_partial_line(WINDOW_SIZE - center_val, center_val);
+    puts("");
 
-        printf("%s", mantissa_string);
-        printf(" * 2^%s\n", exponent_string);
-        print_partial_line(WINDOW_SIZE - center_val, center_val);
-        puts("");
+}
+
+void Edit_Floating_Number(struct float_number *fn, char string[], double new_value){
+    // First, make string lowercase.
+    String_to_Lower(string);
+    int length  = strlen(string);
+
+    // If String is not double or float, exit.
+    if (!(!strncmp(string, "double", length) || !strncmp(string, "float", length))){
+        Error(6);
+    }
+
+    if (!(strncmp(string, "double", length))) {
+        fn->isDouble = true;
+        fn->value.double_value = new_value;
+    }
+    else{
+        fn->isDouble = false;
+        fn->value.float_value = (float)new_value;
+    }
+
+    //Regardless of value, recreate bit number.
+    Create_Bit_Representation(fn);
+    Separate_Floating_Number(fn);
+    Generate_Significand_Number(fn);
+
 
 }
 
@@ -424,19 +389,4 @@ void Additional_Info(void){
     print_dash_line();
 }
 
-void compute(void){
-    struct float_number *fn = calloc(1, sizeof(struct float_number));
-    Initialize_Floating_Number(fn);
-    Create_Bit_Representation(fn);
-    Separate_Floating_Number(fn);
-    Generate_Significand_Number(fn);
-    Print_Float_Number(fn);
-    Additional_Info();
-    free(fn);
 
-}
-
-int main(void){
-    compute();
-    return 0;
-}
