@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------------------------------------
 // Created by Ulysses Carlos on 10/19/19 using Ulysses-H270-HD3.
 //
-// This is just a Driver Program; Test anything you want here.
+// Separated Testing from Float_to_IEEE.h
 //--------------------------------------------------------------------------------------------------
 
 #include "Float_to_IEE.h"
@@ -43,8 +43,8 @@ void compute_with_value(char *string, int length, double value){
     strncpy(temp, string, strlen(string));
     Edit_Floating_Number(fn, temp, value);
     Print_Float_Number(fn);
-
     Additional_Info();
+
     free(fn);
 
 }
@@ -77,7 +77,9 @@ int main(int argc, char *argv[]){
                     || !strncmp(precision, "float", precision_len));
 
         if (!check){
-            printf("%100s is an invalid precision option.", precision);
+            printf("Error: \"");
+            fputs(precision, stdout);
+            printf("\" is a invalid precision option.\n");
             exit(EXIT_FAILURE);
         }
 
@@ -85,8 +87,6 @@ int main(int argc, char *argv[]){
         double value = strtod(argv[2], &temp);
 
         compute_with_value(precision, precision_len, value);
-
-
     }
 
     return 0;

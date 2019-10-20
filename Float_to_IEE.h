@@ -13,6 +13,8 @@
 #include <stdbool.h>
 #include <math.h>
 #include <unistd.h>
+
+
 // Size Definitions
 #define FLOAT_SIZE (sizeof(float) * 8)
 #define FLOAT_LEN (sizeof(float))
