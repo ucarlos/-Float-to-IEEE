@@ -190,7 +190,6 @@ void Initialize_Floating_Number(struct float_number *fn){
 	char *string = calloc(max_length, sizeof(char));
 	char *c_pointer = NULL;
 	if (test == 1){
-	    // It's probably a good idea to fgets a string, test if valid and then convert to double/float
         fgets(string, max_length, stdin);
         test_valid_number(string);
 
@@ -208,7 +207,7 @@ void Initialize_Floating_Number(struct float_number *fn){
     system("clear");
     free(string);
 }
-#pragma clang diagnostic pop
+
 
 void Create_Bit_Representation(struct float_number *fn){
     // There should be a test here to prevent an uninitialized struct here
@@ -231,7 +230,6 @@ void Create_Bit_Representation(struct float_number *fn){
     if (test_endian) // Only necessary on machines that use little endian
         Reverse_Bit_Representation(string, (int)strlen(string));
 
-    // Now read into fn:
     fn->byte_rep = (uint64_t) strtoll(string, &endpoint, 16);
     // Change Status:
     fn->norm_status = Not_Separated;
@@ -358,7 +356,7 @@ void Center_Float_Number(struct float_number *fn){
     char *mantissa_string = calloc(WINDOW_SIZE / 2, sizeof(char));
     char *exponent_string = calloc(WINDOW_SIZE / 2, sizeof(char));
     sprintf(mantissa_string, "%.24Lf", fn->signficand_val);
-    sprintf(exponent_string, "%d", fn->weighed_bias);
+    sprintf(exponent_string, PRId32, fn->weighed_bias);
     int exponent_space = 5; // Accounts for 5-digit exponent values(i.e 2^0 - 2^99999), adjust if necessary
     unsigned center_val = (strlen(mantissa_string) + exponent_space + strlen(exponent_string));
 
@@ -370,6 +368,8 @@ void Center_Float_Number(struct float_number *fn){
     print_partial_line(WINDOW_SIZE - center_val, center_val);
     puts("");
 
+    free(mantissa_string);
+    free(exponent_string);
 }
 
 void Edit_Floating_Number(struct float_number *fn, char string[], double new_value){

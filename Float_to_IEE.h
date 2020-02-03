@@ -77,7 +77,7 @@ struct float_number{
     uint64_t fractional;
     uint64_t byte_rep;
 
-    int weighed_bias;
+    int32_t weighed_bias;
     bool isDouble;
 
     //Union to separate float and double:
