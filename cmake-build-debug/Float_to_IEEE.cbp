@@ -78,10 +78,10 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c">
+		<Unit filename="/home/ulysses/CLionProjects/2019/Float to IEEE/Float_Driver.c">
 			<Option target="Float_to_IEEE"/>
 		</Unit>
-		<Unit filename="/home/ulysses/CLionProjects/2019/Float to IEEE/Test_Float.c">
+		<Unit filename="/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c">
 			<Option target="Float_to_IEEE"/>
 		</Unit>
 		<Unit filename="/home/ulysses/CLionProjects/2019/Float to IEEE/CMakeLists.txt">

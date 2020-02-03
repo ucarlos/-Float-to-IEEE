@@ -4,7 +4,7 @@
 // Separated Testing from Float_to_IEEE.h
 //--------------------------------------------------------------------------------------------------
 
-#include "Float_to_IEE.h"
+#include "Float_to_IEEE.h"
 const int max_length = 100;
 void compute(void){
     struct float_number *fn = calloc(1, sizeof(struct float_number));

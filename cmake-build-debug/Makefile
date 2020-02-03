@@ -123,6 +123,33 @@ Float_to_IEEE/fast:
 	$(MAKE) -f CMakeFiles/Float_to_IEEE.dir/build.make CMakeFiles/Float_to_IEEE.dir/build
 .PHONY : Float_to_IEEE/fast
 
+Float_Driver.o: Float_Driver.c.o
+
+.PHONY : Float_Driver.o
+
+# target to build an object file
+Float_Driver.c.o:
+	$(MAKE) -f CMakeFiles/Float_to_IEEE.dir/build.make CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.o
+.PHONY : Float_Driver.c.o
+
+Float_Driver.i: Float_Driver.c.i
+
+.PHONY : Float_Driver.i
+
+# target to preprocess a source file
+Float_Driver.c.i:
+	$(MAKE) -f CMakeFiles/Float_to_IEEE.dir/build.make CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.i
+.PHONY : Float_Driver.c.i
+
+Float_Driver.s: Float_Driver.c.s
+
+.PHONY : Float_Driver.s
+
+# target to generate assembly for a file
+Float_Driver.c.s:
+	$(MAKE) -f CMakeFiles/Float_to_IEEE.dir/build.make CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.s
+.PHONY : Float_Driver.c.s
+
 Float_to_IEEE.o: Float_to_IEEE.c.o
 
 .PHONY : Float_to_IEEE.o
@@ -150,33 +177,6 @@ Float_to_IEEE.c.s:
 	$(MAKE) -f CMakeFiles/Float_to_IEEE.dir/build.make CMakeFiles/Float_to_IEEE.dir/Float_to_IEEE.c.s
 .PHONY : Float_to_IEEE.c.s
 
-Test_Float.o: Test_Float.c.o
-
-.PHONY : Test_Float.o
-
-# target to build an object file
-Test_Float.c.o:
-	$(MAKE) -f CMakeFiles/Float_to_IEEE.dir/build.make CMakeFiles/Float_to_IEEE.dir/Test_Float.c.o
-.PHONY : Test_Float.c.o
-
-Test_Float.i: Test_Float.c.i
-
-.PHONY : Test_Float.i
-
-# target to preprocess a source file
-Test_Float.c.i:
-	$(MAKE) -f CMakeFiles/Float_to_IEEE.dir/build.make CMakeFiles/Float_to_IEEE.dir/Test_Float.c.i
-.PHONY : Test_Float.c.i
-
-Test_Float.s: Test_Float.c.s
-
-.PHONY : Test_Float.s
-
-# target to generate assembly for a file
-Test_Float.c.s:
-	$(MAKE) -f CMakeFiles/Float_to_IEEE.dir/build.make CMakeFiles/Float_to_IEEE.dir/Test_Float.c.s
-.PHONY : Test_Float.c.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -186,12 +186,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... Float_to_IEEE"
 	@echo "... edit_cache"
+	@echo "... Float_Driver.o"
+	@echo "... Float_Driver.i"
+	@echo "... Float_Driver.s"
 	@echo "... Float_to_IEEE.o"
 	@echo "... Float_to_IEEE.i"
 	@echo "... Float_to_IEEE.s"
-	@echo "... Test_Float.o"
-	@echo "... Test_Float.i"
-	@echo "... Test_Float.s"
 .PHONY : help
 
 

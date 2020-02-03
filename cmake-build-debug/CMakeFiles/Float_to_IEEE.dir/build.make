@@ -70,29 +70,29 @@ CMakeFiles/Float_to_IEEE.dir/Float_to_IEEE.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Float_to_IEEE.dir/Float_to_IEEE.c.s"
 	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c" -o CMakeFiles/Float_to_IEEE.dir/Float_to_IEEE.c.s
 
-CMakeFiles/Float_to_IEEE.dir/Test_Float.c.o: CMakeFiles/Float_to_IEEE.dir/flags.make
-CMakeFiles/Float_to_IEEE.dir/Test_Float.c.o: ../Test_Float.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/ulysses/CLionProjects/2019/Float to IEEE/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Float_to_IEEE.dir/Test_Float.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Float_to_IEEE.dir/Test_Float.c.o   -c "/home/ulysses/CLionProjects/2019/Float to IEEE/Test_Float.c"
+CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.o: CMakeFiles/Float_to_IEEE.dir/flags.make
+CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.o: ../Float_Driver.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/home/ulysses/CLionProjects/2019/Float to IEEE/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.o   -c "/home/ulysses/CLionProjects/2019/Float to IEEE/Float_Driver.c"
 
-CMakeFiles/Float_to_IEEE.dir/Test_Float.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Float_to_IEEE.dir/Test_Float.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/home/ulysses/CLionProjects/2019/Float to IEEE/Test_Float.c" > CMakeFiles/Float_to_IEEE.dir/Test_Float.c.i
+CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E "/home/ulysses/CLionProjects/2019/Float to IEEE/Float_Driver.c" > CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.i
 
-CMakeFiles/Float_to_IEEE.dir/Test_Float.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Float_to_IEEE.dir/Test_Float.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/ulysses/CLionProjects/2019/Float to IEEE/Test_Float.c" -o CMakeFiles/Float_to_IEEE.dir/Test_Float.c.s
+CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S "/home/ulysses/CLionProjects/2019/Float to IEEE/Float_Driver.c" -o CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.s
 
 # Object files for target Float_to_IEEE
 Float_to_IEEE_OBJECTS = \
 "CMakeFiles/Float_to_IEEE.dir/Float_to_IEEE.c.o" \
-"CMakeFiles/Float_to_IEEE.dir/Test_Float.c.o"
+"CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.o"
 
 # External object files for target Float_to_IEEE
 Float_to_IEEE_EXTERNAL_OBJECTS =
 
 Float_to_IEEE: CMakeFiles/Float_to_IEEE.dir/Float_to_IEEE.c.o
-Float_to_IEEE: CMakeFiles/Float_to_IEEE.dir/Test_Float.c.o
+Float_to_IEEE: CMakeFiles/Float_to_IEEE.dir/Float_Driver.c.o
 Float_to_IEEE: CMakeFiles/Float_to_IEEE.dir/build.make
 Float_to_IEEE: CMakeFiles/Float_to_IEEE.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/home/ulysses/CLionProjects/2019/Float to IEEE/cmake-build-debug/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Linking C executable Float_to_IEEE"

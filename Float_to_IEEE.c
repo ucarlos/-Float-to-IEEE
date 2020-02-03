@@ -51,7 +51,7 @@
  * ----------------------------------------------------------------------------------------------------
  */
 
-#include "Float_to_IEE.h"
+#include "Float_to_IEEE.h"
 
 int Test_Little_Endian(void){
     // Test whether machine is little or big endian:
@@ -269,8 +269,8 @@ void Separate_Floating_Number(struct float_number *fn){
 
     //Generate Bias for Normalized and Denormalized values:
     if (fn->float_status != Special_Case){
-        int temp_bias = (fn -> isDouble) ? DOUBLE_EXPONENT_BIAS : FLOAT_EXPONENT_BIAS;
-        fn->weighed_bias = (!fn->float_status) ? ((int) fn->exponent_val - temp_bias)
+        int32_t temp_bias = (fn -> isDouble) ? DOUBLE_EXPONENT_BIAS : FLOAT_EXPONENT_BIAS;
+        fn->weighed_bias = (!fn->float_status) ? ((int32_t) fn->exponent_val - temp_bias)
                 : (1 - temp_bias);
 
 
@@ -356,7 +356,7 @@ void Center_Float_Number(struct float_number *fn){
     char *mantissa_string = calloc(WINDOW_SIZE / 2, sizeof(char));
     char *exponent_string = calloc(WINDOW_SIZE / 2, sizeof(char));
     sprintf(mantissa_string, "%.24Lf", fn->signficand_val);
-    sprintf(exponent_string, PRId32, fn->weighed_bias);
+    sprintf(exponent_string, "%" PRId32 , fn->weighed_bias);
     int exponent_space = 5; // Accounts for 5-digit exponent values(i.e 2^0 - 2^99999), adjust if necessary
     unsigned center_val = (strlen(mantissa_string) + exponent_space + strlen(exponent_string));
 

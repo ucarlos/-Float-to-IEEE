@@ -117,7 +117,7 @@ bool is_valid_number(char *string);
 void test_valid_number(char *string);
 
 // Constants
-inline static clear_buffer(void){
+inline static void clear_buffer(void){
 	while (getchar() != '\n')
         continue;
 }
