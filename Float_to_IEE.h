@@ -41,7 +41,7 @@
 
 // For Terminal Screen:
 #define CHAR_LINE ('-')
-#define WINDOW_SIZE (90)
+#define WINDOW_SIZE (80)
 
 // Typedefs:
 typedef unsigned char *byte_pointer;
@@ -112,7 +112,13 @@ void String_to_Lower(char *string);
 
 // Line Drawing Functions:
 void print_dash_line(void);
-void print_partial_line(int start, int size);
+void print_partial_line(int start, unsigned int size);
+bool is_valid_number(char *string);
+void test_valid_number(char *string);
 
-
+// Constants
+inline static clear_buffer(void){
+	while (getchar() != '\n')
+        continue;
+}
 #endif

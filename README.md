@@ -17,6 +17,10 @@ Where [Precision] can be the following values:
 * float
 * double
 
+You can omit the [Precision] option to evaluate a Double Precision number:
+```bash
+./Float_to_IEEE [Number]
+```
 ### Command-Line Example
 ```bash
 ./Float_to_IEEE float 4096.12

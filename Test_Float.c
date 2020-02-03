@@ -6,23 +6,6 @@
 
 #include "Float_to_IEE.h"
 const int max_length = 100;
-
-void test_edit(void){
-    struct float_number *fn = calloc(1, sizeof(struct float_number));
-    char string[max_length];
-    strncpy(string, "FLOAT", sizeof("FLOAT"));
-
-    printf("\nTesting Num edit with 260.21(Float)\n");
-    Edit_Floating_Number(fn, string, 260.21);
-    Print_Float_Number(fn);
-    strncpy(string, "DOUBLE", strlen("DOUBLE"));
-    printf("\nTesting Num edit with 260.21(Double)\n");
-    Edit_Floating_Number(fn, string, 260.21);
-    Print_Float_Number(fn);
-
-    free(fn);
-}
-
 void compute(void){
     struct float_number *fn = calloc(1, sizeof(struct float_number));
 
@@ -36,7 +19,7 @@ void compute(void){
 
 }
 
-void compute_with_value(char *string, int length, double value){
+void compute_with_value(char *string, double value) {
     struct float_number *fn = calloc(1, sizeof(struct float_number));
 
     char temp[max_length];
@@ -54,14 +37,57 @@ void command_instructions(void){
     puts("[PRECISION] may be one of the following options:");
     puts("float -- Single Precision");
     puts("double -- Double Precision");
+    puts ("You can omit the [PRECISION] to evaluate a number with double precision.");
 
 
 }
 
+bool is_valid_number(char *string){
+    int dot_count = 0;
+    unsigned length = strlen(string);
+    // Remove any newline/control characters from the string
+    // if there are any
+    if (iscntrl(string[length - 1]))
+        string[length - 1] = '\0';
+
+
+    for (char *p = string; *p; p++) {
+        if (*(p) == '.') {
+            dot_count++;
+            if (dot_count > 1)
+                return false;
+        }
+        else if (!isdigit(*p))
+            return false;
+    }
+    return true;
+}
+
+void test_valid_number(char *string){
+    bool check = is_valid_number(string);
+    if (!check){
+        fprintf(stderr, "Error: ");
+        fputs(string, stderr);
+        fprintf(stderr, " is not a valid number.\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
 int main(int argc, char *argv[]){
     // User passed only ./Float_to_IEEE as argument
+    // Consider a argc 2 case, default to double
     if (argc == 1)
         compute();
+    else if (argc == 2){
+        char *precision = "double";
+        test_valid_number(argv[1]);
+
+        char *c_pointer = NULL;
+        double value = strtod(argv[1], &c_pointer);
+
+        compute_with_value(precision, value);
+
+    }
     else{
         // Usage: ./Float_to_IEEE, float/double [Number]
         // First make sure that argc == 3, if not exit.
@@ -69,6 +95,7 @@ int main(int argc, char *argv[]){
             command_instructions();
             exit(EXIT_FAILURE);
         }
+	
         char *precision = calloc(max_length, sizeof(char));
         int precision_len  = sizeof(argv[1]);
         strncpy(precision, argv[1], precision_len);
@@ -77,16 +104,20 @@ int main(int argc, char *argv[]){
                     || !strncmp(precision, "float", precision_len));
 
         if (!check){
-            printf("Error: \"");
-            fputs(precision, stdout);
-            printf("\" is a invalid precision option.\n");
+            fprintf(stderr, "Error: \"");
+            fputs(precision, stderr);
+            fprintf(stderr,"\" is a invalid precision option.\n");
             exit(EXIT_FAILURE);
         }
 
+
         char *temp;
+        test_valid_number(argv[2]);
+
         double value = strtod(argv[2], &temp);
 
-        compute_with_value(precision, precision_len, value);
+        compute_with_value(precision, value);
+        free(precision);
     }
 
     return 0;

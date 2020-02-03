@@ -6,12 +6,13 @@
  *
  *  Program Amendments:
  *      Various adjustments made before 07/21/19
- *      07/21/19 -- Introduced commenting to make program easier to read
- *      09/14/19 -- Replaced the Bit-field Normalization_Status with enum
- *                  Changed Print_Floating_Number to display Special Case Floating-Point Numbers.
- *                  Changed unsigned long long ints to uint64 for portability
- *     10/19/19  -- Added Edit_Floating_Number to change value, moved macros, structure and function definitions
- *                  to Float_to_IEE.h
+ *      07/21/2019 -- Introduced commenting to make program easier to read
+ *      09/14/2019 -- Replaced the Bit-field Normalization_Status with enum
+ *                    Changed Print_Floating_Number to display Special Case Floating-Point Numbers.
+ *                    Changed unsigned long long ints to uint64 for portability
+ *     10/19/2019  -- Added Edit_Floating_Number to change value, moved macros, structure and function definitions
+ *                    to Float_to_IEE.h
+ *     02/02/2020  -- Minor Changes
  *
  *  Program Usage:
  *      This program converts a floating-point number (whether single or double precision), and converts
@@ -51,7 +52,6 @@
  */
 
 #include "Float_to_IEE.h"
-
 
 int Test_Little_Endian(void){
     // Test whether machine is little or big endian:
@@ -93,13 +93,13 @@ void String_to_Lower(char *string){
 void Print_Instructions(void){
     print_dash_line();
 
-	printf("This program evaluates a value with Single Precision (a \"float\")"
-        "\nor with Double Precision(a \"double\")\n\n");
+    printf("This program evaluates a value with Single Precision (a \"float\")"
+	   "\nor with Double Precision(a \"double\")\n\n");
+    
+    printf("Input 1 for Single Precision and 2 for Double Precision.\n");
+    printf("If Uncertain, input 2.\n");
 
-	printf("Input 1 for Single Precision and 2 for Double Precision.\n");
-	printf("If Uncertain, input 2.\n");
-
-	print_dash_line();
+    print_dash_line();
 
 }
 
@@ -110,7 +110,7 @@ void print_dash_line(void){
     printf("\n");
 };
 
-void print_partial_line(int start, int size){
+void print_partial_line(int start, unsigned int size){
     Center_Line(0, start);
     if ((start + size) > WINDOW_SIZE) {
         Error(5);
@@ -130,33 +130,33 @@ void Error(unsigned int error_code){
 }
 
 void Print_Error_Message(unsigned int error_code){
-    printf("Error: ");
+    fprintf(stderr, "Error: ");
     switch(error_code){
         case 1:
-            printf("Invalid Input.");
+            fprintf(stderr,"Invalid Input.");
             break;
         case 2:
-            printf("Cannot use a Special-Case "
+            fprintf(stderr,"Cannot use a Special-Case "
                    "Floating-Point Number for this situation.\n");
             break;
         case 3:
-            printf("The Floating-Point Case "
+            fprintf(stderr,"The Floating-Point Case "
                    "for this number has not been generated.\n");
             break;
 
         case 4:
-            printf("The Bit-level Representation "
+            fprintf(stderr,"The Bit-level Representation "
                    "has yet to be created for this Floating-Point Number.\n");
             break;
         case 5:
-            printf("Partial line is larger than window length (%d)\n", WINDOW_SIZE);
+            fprintf(stderr,"Partial line is larger than window length (%d)\n", WINDOW_SIZE);
             break;
         case 6:
-            printf("Edit_Floating_Number must have a string of \"double\" or \"float\" "
+            fprintf(stderr, "Edit_Floating_Number must have a string of \"double\" or \"float\" "
                    "as a parameter.\n");
             break;
         default:
-            puts("An Unknown error has occurred. Exiting.");
+            fprintf(stderr, "An Unknown error has occurred. Exiting.\n");
             break;
     }
 
@@ -168,36 +168,47 @@ void Print_Error_Message(unsigned int error_code){
 //
 //--------------------------------------------------------------------------------
 
+
 void Initialize_Floating_Number(struct float_number *fn){
-	float float_num;
-	double double_num;
 	int test;
-    Print_Instructions();
+	int max_length = 100;
+	Print_Instructions();
 
 	scanf("%d", &test);
 
 	if (!(test == 1 || test == 2)){
 	    system("clear");
-		puts("Invalid Input. This program will now close.");
+		fprintf(stderr,"Invalid Input. This program will now close.\n");
 		sleep(1);
 		exit(EXIT_FAILURE);
 	}
 
 	puts("Now please enter a number:");
+	// Since C has issues when using scanf and fgets, clear the buffer
+    clear_buffer(); // I completely forgot about doing that.
+
+	char *string = calloc(max_length, sizeof(char));
+	char *c_pointer = NULL;
 	if (test == 1){
-		scanf("%f", &float_num);
-		fn->value.float_value = float_num;
+	    // It's probably a good idea to fgets a string, test if valid and then convert to double/float
+        fgets(string, max_length, stdin);
+        test_valid_number(string);
+
+		fn->value.float_value = strtof(string, &c_pointer);
 		fn->isDouble = false;
 	}
 	else {
-        scanf("%lf", &double_num);
-        fn->value.double_value = double_num;
+        fgets(string, max_length, stdin);
+        test_valid_number(string);
+        fn->value.double_value = strtod(string, &c_pointer);
         fn->isDouble = true;
     };
 
 	fn->norm_status = Initialized;
     system("clear");
+    free(string);
 }
+#pragma clang diagnostic pop
 
 void Create_Bit_Representation(struct float_number *fn){
     // There should be a test here to prevent an uninitialized struct here
@@ -315,6 +326,7 @@ void Print_Float_Number(struct float_number *fn){
 
     print_dash_line();
     puts("Floating Point Information:");
+    print_dash_line();
     Print_General_Float_Info(fn);
     // For Normalized and Denormalized Values:
     if (fn->float_status != Special_Case){
@@ -348,7 +360,7 @@ void Center_Float_Number(struct float_number *fn){
     sprintf(mantissa_string, "%.24Lf", fn->signficand_val);
     sprintf(exponent_string, "%d", fn->weighed_bias);
     int exponent_space = 5; // Accounts for 5-digit exponent values(i.e 2^0 - 2^99999), adjust if necessary
-    int center_val = (strlen(mantissa_string) + exponent_space + strlen(exponent_string));
+    unsigned center_val = (strlen(mantissa_string) + exponent_space + strlen(exponent_string));
 
     print_partial_line(WINDOW_SIZE - (center_val), center_val);
     Center_Line(0, WINDOW_SIZE - (center_val));
