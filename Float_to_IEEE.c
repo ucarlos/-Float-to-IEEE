@@ -13,6 +13,7 @@
  *     10/19/2019  -- Added Edit_Floating_Number to change value, moved macros, structure and function definitions
  *                    to Float_to_IEE.h
  *     02/02/2020  -- Minor Changes
+ *     02/15/2019  -- Fix a bug that would display negative double values incorrectly
  *
  *  Program Usage:
  *      This program converts a floating-point number (whether single or double precision), and converts
@@ -116,8 +117,8 @@ void print_partial_line(int start, unsigned int size){
         Error(5);
     }
 
-    int loop_end = (start + size);
-    for (int i = start; i < loop_end; i++)
+    unsigned int loop_end = (start + size);
+    for (unsigned int i = start; i < loop_end; i++)
         putchar(CHAR_LINE);
     printf("\n");
 
@@ -185,27 +186,28 @@ void Initialize_Floating_Number(struct float_number *fn){
 
 	puts("Now please enter a number:");
 	// Since C has issues when using scanf and fgets, clear the buffer
-    clear_buffer(); // I completely forgot about doing that.
+	
+	clear_buffer(); // I completely forgot about doing that.
 
 	char *string = calloc(max_length, sizeof(char));
 	char *c_pointer = NULL;
 	if (test == 1){
-        fgets(string, max_length, stdin);
-        test_valid_number(string);
+	    fgets(string, max_length, stdin);
+	    test_valid_number(string);
 
-		fn->value.float_value = strtof(string, &c_pointer);
-		fn->isDouble = false;
+	    fn->value.float_value = strtof(string, &c_pointer);
+	    fn->isDouble = false;
 	}
 	else {
-        fgets(string, max_length, stdin);
-        test_valid_number(string);
-        fn->value.double_value = strtod(string, &c_pointer);
-        fn->isDouble = true;
+	    fgets(string, max_length, stdin);
+	    test_valid_number(string);
+	    fn->value.double_value = strtod(string, &c_pointer);
+	    fn->isDouble = true;
     };
 
 	fn->norm_status = Initialized;
-    system("clear");
-    free(string);
+	system("clear");
+	free(string);
 }
 
 
@@ -229,8 +231,8 @@ void Create_Bit_Representation(struct float_number *fn){
 
     if (test_endian) // Only necessary on machines that use little endian
         Reverse_Bit_Representation(string, (int)strlen(string));
-
-    fn->byte_rep = (uint64_t) strtoll(string, &endpoint, 16);
+    // strtoll can't handle negative double values, so use this instead.
+    fn->byte_rep = strtoull(string, &endpoint, 16);
     // Change Status:
     fn->norm_status = Not_Separated;
     free(string);
@@ -245,9 +247,10 @@ void Separate_Floating_Number(struct float_number *fn){
     // Difference Masks are used depending on float/double
     // and are right-shifted depending on the length of the data type
     if (fn->isDouble){
-        fn->sign_val = (fn->byte_rep & DOUBLE_SIGN_MASK) >> (DOUBLE_EXP_LEN + DOUBLE_FRAC_LEN);
-        fn->exponent_val = (fn->byte_rep & DOUBLE_EXP_MASK) >> (DOUBLE_FRAC_LEN);
-        fn->fractional = (fn->byte_rep & DOUBLE_FRAC_MASK);
+        u_int64_t bit_rep = (u_int64_t) fn->byte_rep;
+        fn->sign_val = (bit_rep & DOUBLE_SIGN_MASK) >> (DOUBLE_EXP_LEN + DOUBLE_FRAC_LEN);
+        fn->exponent_val = (bit_rep & DOUBLE_EXP_MASK) >> (DOUBLE_FRAC_LEN);
+        fn->fractional = (bit_rep & DOUBLE_FRAC_MASK);
     }
     else {
         // Convert to unsigned int to make sure the bit operations work for Float:
@@ -269,8 +272,8 @@ void Separate_Floating_Number(struct float_number *fn){
 
     //Generate Bias for Normalized and Denormalized values:
     if (fn->float_status != Special_Case){
-        int32_t temp_bias = (fn -> isDouble) ? DOUBLE_EXPONENT_BIAS : FLOAT_EXPONENT_BIAS;
-        fn->weighed_bias = (!fn->float_status) ? ((int32_t) fn->exponent_val - temp_bias)
+        int temp_bias = (fn -> isDouble) ? DOUBLE_EXPONENT_BIAS : FLOAT_EXPONENT_BIAS;
+        fn->weighed_bias = (!fn->float_status) ? ((int) fn->exponent_val - temp_bias)
                 : (1 - temp_bias);
 
 
@@ -335,17 +338,18 @@ void Print_Float_Number(struct float_number *fn){
             printf(" %.4f is represented as ", fn->value.double_value);
         else
             printf(" %.4f is represented as ", fn->value.float_value);
+	
         printf("\n\n");
         // Center number:
-	    Center_Float_Number(fn);
-    	printf("When multiplied, the result is %.24Lf\n", fn->signficand_val * pow(2, fn->weighed_bias));
+        Center_Float_Number(fn);
+        printf("When multiplied, the result is %.24Lf\n", fn->signficand_val * pow(2, fn->weighed_bias));
     }
-    else{ 
-	    printf("Special Case Value: ");
-	    if (!(fn->fractional))
-	        printf(!(fn->sign_val)? "Positive Infinity\n" : "Negative Infinity\n");
-	    else
-	        printf("Not A Number (NaN)\n");
+    else{
+        printf("Special Case Value: ");
+	if (!(fn->fractional))
+	    printf(!(fn->sign_val)? "Positive Infinity\n" : "Negative Infinity\n");
+	else
+	    printf("Not A Number (NaN)\n");
     }
 
     print_dash_line();
@@ -356,7 +360,7 @@ void Center_Float_Number(struct float_number *fn){
     char *mantissa_string = calloc(WINDOW_SIZE / 2, sizeof(char));
     char *exponent_string = calloc(WINDOW_SIZE / 2, sizeof(char));
     sprintf(mantissa_string, "%.24Lf", fn->signficand_val);
-    sprintf(exponent_string, "%" PRId32 , fn->weighed_bias);
+    sprintf(exponent_string, "%" PRId32, fn->weighed_bias);
     int exponent_space = 5; // Accounts for 5-digit exponent values(i.e 2^0 - 2^99999), adjust if necessary
     unsigned center_val = (strlen(mantissa_string) + exponent_space + strlen(exponent_string));
 

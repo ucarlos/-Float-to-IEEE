@@ -23,7 +23,7 @@
 #define FLOAT_FRAC_LEN (23)
 #define FLOAT_MAX_EXPONENT_VAL ((1 << 8) - 1)
 
-#define DOUBLE_SIZE (2 * FLOAT_SIZE)
+#define DOUBLE_SIZE (sizeof(double) * 8)
 #define DOUBLE_LEN (sizeof(double))
 #define DOUBLE_EXPONENT_BIAS (((1 << 10) - 1))
 #define DOUBLE_EXP_LEN (11)
@@ -34,9 +34,9 @@
 #define FLOAT_SIGN_MASK (0x80000000)
 #define FLOAT_EXP_MASK (0x7f800000)
 #define FLOAT_FRAC_MASK (0x007fffff)
-#define DOUBLE_SIGN_MASK (0x8000000000000000)
-#define DOUBLE_EXP_MASK (0x7ff0000000000000)
-#define DOUBLE_FRAC_MASK (0x000fffffffffffff)
+#define DOUBLE_SIGN_MASK (0x8000000000000000UL)
+#define DOUBLE_EXP_MASK (0x7ff0000000000000UL)
+#define DOUBLE_FRAC_MASK (0x000fffffffffffffUL)
 
 
 // For Terminal Screen:

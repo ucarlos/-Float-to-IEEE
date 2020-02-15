@@ -1,3 +1,0 @@
-/home/ulysses/CLionProjects/2019/Float to IEEE/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/ulysses/CLionProjects/2019/Float to IEEE/cmake-build-debug/CMakeFiles/Float_to_IEEE.dir
-/home/ulysses/CLionProjects/2019/Float to IEEE/cmake-build-debug/CMakeFiles/edit_cache.dir

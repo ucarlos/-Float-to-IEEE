@@ -44,12 +44,17 @@ void command_instructions(void){
 
 bool is_valid_number(char *string){
     int dot_count = 0;
+
     unsigned length = strlen(string);
+    if (length < 2)
+        Error(1);
     // Remove any newline/control characters from the string
     // if there are any
     if (iscntrl(string[length - 1]))
         string[length - 1] = '\0';
 
+    if (string[0] == '-' || string[0] == '+') // Sign
+        string++;
 
     for (char *p = string; *p; p++) {
         if (*(p) == '.') {
