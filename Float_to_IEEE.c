@@ -10,10 +10,10 @@
  *      09/14/2019 -- Replaced the Bit-field Normalization_Status with enum
  *                    Changed Print_Floating_Number to display Special Case Floating-Point Numbers.
  *                    Changed unsigned long long ints to uint64 for portability
- *     10/19/2019  -- Added Edit_Floating_Number to change value, moved macros, structure and function definitions
+ *      10/19/2019 -- Added Edit_Floating_Number to change value, moved macros, structure and function definitions
  *                    to Float_to_IEE.h
- *     02/02/2020  -- Minor Changes
- *     02/15/2019  -- Fix a bug that would display negative double values incorrectly
+ *      02/02/2020 -- Minor Changes
+ *      02/15/2020 -- Fixed a bug that would display negative double values incorrectly
  *
  *  Program Usage:
  *      This program converts a floating-point number (whether single or double precision), and converts
@@ -30,7 +30,7 @@
  *      number, so please don't mess with them.
  *
  *      If you don't know how this program works, try to learn how to take decimal numbers and convert
- *      them to their floating-point equivalent(in binary first). This program such makes that process
+ *      them to their floating-point equivalent(in binary first). This program makes that process
  *      easier. As an reference, try this: https://en.wikipedia.org/wiki/Floating-point_arithmetic
  *
  *      As an example, try to take a number (say 12.25), and convert it by hand first by converting
@@ -203,8 +203,8 @@ void Initialize_Floating_Number(struct float_number *fn){
 	    test_valid_number(string);
 	    fn->value.double_value = strtod(string, &c_pointer);
 	    fn->isDouble = true;
-    };
-
+	}
+	
 	fn->norm_status = Initialized;
 	system("clear");
 	free(string);
@@ -254,7 +254,7 @@ void Separate_Floating_Number(struct float_number *fn){
     }
     else {
         // Convert to unsigned int to make sure the bit operations work for Float:
-        unsigned int bit_rep = (unsigned int)fn->byte_rep;
+        u_int32_t bit_rep = (u_int32_t)fn->byte_rep;
         // Get Sign value:
 
         fn->sign_val = (bit_rep & FLOAT_SIGN_MASK) >> (FLOAT_EXP_LEN + FLOAT_FRAC_LEN);

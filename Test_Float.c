@@ -38,6 +38,7 @@ void command_instructions(void){
     puts("float -- Single Precision");
     puts("double -- Double Precision");
     puts ("You can omit the [PRECISION] to evaluate a number with double precision.");
+    puts ("Example: ./Float_to_IEEE 17.76");
 
 
 }
@@ -49,11 +50,11 @@ bool is_valid_number(char *string){
     if (length < 2)
         Error(1);
     // Remove any newline/control characters from the string
-    // if there are any
     if (iscntrl(string[length - 1]))
         string[length - 1] = '\0';
 
-    if (string[0] == '-' || string[0] == '+') // Sign
+    // Only accepts signs at the beginning of the string
+    if (string[0] == '-' || string[0] == '+')
         string++;
 
     for (char *p = string; *p; p++) {
