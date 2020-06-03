@@ -107,12 +107,14 @@ int main(int argc, char *argv[]){
         strncpy(precision, argv[1], precision_len);
 
         bool check = (!strncmp(precision, "double", precision_len)
-                    || !strncmp(precision, "float", precision_len));
+		      || !strncmp(precision, "float", precision_len));
 
         if (!check){
             fprintf(stderr, "Error: \"");
             fputs(precision, stderr);
             fprintf(stderr,"\" is a invalid precision option.\n");
+	    // Free precision:
+	    free(precision);
             exit(EXIT_FAILURE);
         }
 

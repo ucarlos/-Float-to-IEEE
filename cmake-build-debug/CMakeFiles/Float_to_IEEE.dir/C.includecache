@@ -6,11 +6,11 @@
 
 #IncludeRegexTransform: 
 
-/home/ulysses/CLionProjects/2019/Float to IEEE/Float_Driver.c
-Float_to_IEE.h
-/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEE.h
+/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c
+Float_to_IEEE.h
+/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.h
 
-/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEE.h
+/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.h
 stdio.h
 -
 stdlib.h
@@ -32,7 +32,7 @@ math.h
 unistd.h
 -
 
-/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.c
-Float_to_IEE.h
-/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEE.h
+/home/ulysses/CLionProjects/2019/Float to IEEE/Test_Float.c
+Float_to_IEEE.h
+/home/ulysses/CLionProjects/2019/Float to IEEE/Float_to_IEEE.h
 
