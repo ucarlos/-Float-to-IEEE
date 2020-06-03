@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/Float_to_IEEE.dir/Float_to_IEEE.c.o CMakeFiles/Float_to_IEEE.dir/main.c.o  -o Float_to_IEEE  -lm 
