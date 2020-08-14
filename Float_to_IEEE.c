@@ -386,7 +386,7 @@ void Edit_Floating_Number(struct float_number *fn, char string[], double new_val
         Error(6);
     }
 
-    if (!(strncmp(string, "double", length))) {
+    if (!(strncmp(string, "double", length))){
         fn->isDouble = true;
         fn->value.double_value = new_value;
     }

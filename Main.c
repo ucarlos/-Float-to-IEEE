@@ -57,7 +57,7 @@ bool is_valid_number(char *string){
     if (string[0] == '-' || string[0] == '+')
         string++;
 
-    for (char *p = string; *p; p++) {
+    for (char *p = string; *p; p++){
         if (*(p) == '.') {
             dot_count++;
             if (dot_count > 1)
@@ -102,7 +102,8 @@ int main(int argc, char *argv[]){
             exit(EXIT_FAILURE);
         }
 	
-        char *precision = calloc(max_length, sizeof(char));
+        /* char *precision = calloc(max_length, sizeof(char)); */
+	char precision[max_length];
         int precision_len  = sizeof(argv[1]);
         strncpy(precision, argv[1], precision_len);
 
@@ -113,8 +114,7 @@ int main(int argc, char *argv[]){
             fprintf(stderr, "Error: \"");
             fputs(precision, stderr);
             fprintf(stderr,"\" is a invalid precision option.\n");
-	    // Free precision:
-	    free(precision);
+
             exit(EXIT_FAILURE);
         }
 
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]){
         double value = strtod(argv[2], &temp);
 
         compute_with_value(precision, value);
-        free(precision);
+
     }
 
     return 0;
