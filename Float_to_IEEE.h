@@ -72,23 +72,22 @@ enum Normalization_Status{
 
 // Struct definition
 struct float_number{
+    long double signficand_val;    
     uint64_t sign_val;
     uint64_t exponent_val;
     uint64_t fractional;
     uint64_t byte_rep;
-
-    int32_t weighed_bias;
-    bool isDouble;
-
+    
     //Union to separate float and double:
     union datatype_value{
         double double_value;
         float float_value;
     }value;
-    long double signficand_val;
-
+    
+    int32_t weighed_bias;
     enum Floating_Number_Status float_status;
     enum Normalization_Status norm_status;
+    bool isDouble;
 };
 
 // Structure Functions Prototypes::
